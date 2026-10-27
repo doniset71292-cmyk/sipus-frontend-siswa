@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { getCurrentUser, getBooks, getBookDetail } from "../services/authService";
 import { createBorrowing, formatIndoDate } from "../services/borrowService";
+import { confirmAction, toastSuccess, alertError } from "../utils/alert";
 
 export default function PengajuanPeminjaman() {
   const [searchParams] = useSearchParams();
@@ -125,6 +126,25 @@ export default function PengajuanPeminjaman() {
       return;
     }
 
+    const { confirmed } = await confirmAction({
+      title: "Konfirmasi Pengajuan",
+      html: `
+        <div style="font-size: 0.875rem; text-align: left; margin-top: 0.5rem; line-height: 1.5;">
+          <p>Pastikan data pengajuan peminjaman sudah benar:</p>
+          <div style="margin-top: 0.5rem; padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <p style="font-weight: 700; color: #1e293b; margin-bottom: 0.25rem;">${selectedBook.title}</p>
+            <p style="color: #64748b; font-size: 0.8rem;">Jumlah: <strong>${quantity}</strong> eksemplar</p>
+            <p style="color: #64748b; font-size: 0.8rem;">Batas Kembali: <strong>${formatIndoDate(dueDate)}</strong></p>
+          </div>
+        </div>
+      `,
+      confirmText: "Ya, Kirim Pengajuan",
+      cancelText: "Periksa Lagi",
+      icon: "question",
+    });
+
+    if (!confirmed) return;
+
     setSubmitting(true);
     const result = await createBorrowing({
       bookId: selectedBook.id,
@@ -136,12 +156,21 @@ export default function PengajuanPeminjaman() {
 
     if (result.success && result.data) {
       setSuccessData(result.data);
+      toastSuccess("Pengajuan peminjaman berhasil dikirim!");
     } else {
       if (result.errors) {
         const errorList = Object.values(result.errors).flat().join(" ");
         setErrorMessage(errorList || result.message || "Gagal mengajukan peminjaman.");
+        alertError({
+          title: "Pengajuan Gagal",
+          text: errorList || result.message || "Gagal mengajukan peminjaman.",
+        });
       } else {
         setErrorMessage(result.message || "Terjadi kesalahan saat mengajukan peminjaman.");
+        alertError({
+          title: "Pengajuan Gagal",
+          text: result.message || "Terjadi kesalahan saat mengajukan peminjaman.",
+        });
       }
     }
   };
@@ -150,6 +179,7 @@ export default function PengajuanPeminjaman() {
     if (navigator?.clipboard?.writeText) {
       navigator.clipboard.writeText(text);
       setCopiedCode(true);
+      toastSuccess("Kode transaksi disalin!");
       setTimeout(() => setCopiedCode(false), 2000);
     }
   };

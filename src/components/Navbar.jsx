@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getCurrentUser, logout } from "../services/authService";
 import logoImg from "../assets/logo.png";
 
+import { confirmAction, toastSuccess } from "../utils/alert";
+
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -10,8 +12,18 @@ export default function Navbar() {
   const user = getCurrentUser();
 
   const handleLogout = async () => {
-    if (window.confirm("Apakah Anda yakin ingin keluar?")) {
+    const { confirmed } = await confirmAction({
+      title: "Konfirmasi Keluar",
+      text: "Apakah Anda yakin ingin keluar dari akun SIPUS?",
+      confirmText: "Ya, Keluar",
+      cancelText: "Batal",
+      icon: "warning",
+      danger: true,
+    });
+
+    if (confirmed) {
       await logout();
+      toastSuccess("Berhasil keluar");
       navigate("/login-siswa");
     }
   };

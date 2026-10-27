@@ -1,1 +1,152 @@
 @import "tailwindcss";
+
+/* ===================================================================
+   SweetAlert2 Custom Modern Styling for SIPUS Siswa
+   =================================================================== */
+
+/* Latar gelap di belakang dialog */
+body .swal2-container.swal2-backdrop-show {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+/* Kartu dialog */
+body .swal2-popup.sipus-popup {
+  width: 26rem;
+  max-width: 90vw;
+  padding: 1.75rem 1.5rem 1.5rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 1.25rem;
+  background: #ffffff;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+body .swal2-popup.sipus-popup .swal2-icon {
+  margin: 0 auto 1rem;
+  font-size: 0.8rem;
+}
+
+/* Warna ikon */
+body .swal2-popup .swal2-icon.swal2-question {
+  border-color: #bfdbfe;
+  color: #2563eb;
+}
+body .swal2-popup .swal2-icon.swal2-warning {
+  border-color: #fde68a;
+  color: #f59e0b;
+}
+body .swal2-popup .swal2-icon.swal2-error {
+  border-color: #fecdd3;
+  color: #e11d48;
+}
+body .swal2-popup .swal2-icon.swal2-error [class^="swal2-x-mark-line"] {
+  background-color: #e11d48;
+}
+body .swal2-popup .swal2-icon.swal2-success {
+  border-color: #a7f3d0;
+  color: #10b981;
+}
+body .swal2-popup .swal2-icon.swal2-success [class^="swal2-success-line"] {
+  background-color: #10b981;
+}
+body .swal2-popup .swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Judul dan teks */
+body .swal2-popup.sipus-popup .sipus-title {
+  margin: 0;
+  padding: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+}
+body .swal2-popup.sipus-popup .sipus-text {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+/* Area tombol */
+body .swal2-popup.sipus-popup .sipus-actions {
+  margin: 1.5rem 0 0;
+  gap: 0.625rem;
+}
+
+/* Tombol */
+body .swal2-popup.sipus-popup:not(.swal2-loading) .swal2-actions:not(.swal2-loading) .swal2-styled.sipus-confirm,
+body .swal2-popup.sipus-popup:not(.swal2-loading) .swal2-actions:not(.swal2-loading) .swal2-styled.sipus-cancel {
+  margin: 0;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  cursor: pointer;
+}
+
+body .swal2-popup.sipus-popup .swal2-styled.sipus-confirm:focus {
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
+}
+body .swal2-popup.sipus-popup .swal2-styled.sipus-confirm-danger:focus {
+  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.25);
+}
+
+/* Tombol Batal */
+body .swal2-popup.sipus-popup .swal2-styled.sipus-cancel {
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #475569;
+}
+body .swal2-popup.sipus-popup .swal2-styled.sipus-cancel:hover {
+  background-color: #f8fafc;
+  background-image: none;
+}
+body .swal2-popup.sipus-popup .swal2-styled.sipus-cancel:focus {
+  box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.25);
+}
+
+/* Pesan validasi error di dalam dialog */
+body .swal2-popup.sipus-popup .sipus-validation {
+  margin: 1rem 0 0;
+  padding: 0.75rem 0.875rem;
+  justify-content: flex-start;
+  border: 1px solid rgba(254, 205, 211, 0.8);
+  border-radius: 0.75rem;
+  background: #fff1f2;
+  color: #9f1239;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: left;
+}
+body .swal2-popup.sipus-popup .sipus-validation::before {
+  margin: 0 0.5rem 0 0;
+  background-color: #e11d48;
+}
+
+/* Notifikasi kecil (toast) di pojok kanan atas */
+body .swal2-popup.swal2-toast.sipus-toast {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 0.75rem;
+  background: #ffffff;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  font-family: inherit;
+}
+body .swal2-popup.swal2-toast.sipus-toast .swal2-title {
+  margin: 0 0.5rem;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+body .swal2-popup.swal2-toast.sipus-toast .swal2-timer-progress-bar {
+  height: 3px;
+  background: rgba(37, 99, 235, 0.6);
+}

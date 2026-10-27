@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { getMyBorrowings, formatIndoDate, getStatusBadge } from "../services/borrowService";
+import { toastSuccess } from "../utils/alert";
 
 export default function RiwayatPeminjaman() {
   const [borrowings, setBorrowings] = useState([]);
@@ -42,6 +43,7 @@ export default function RiwayatPeminjaman() {
     if (navigator?.clipboard?.writeText) {
       navigator.clipboard.writeText(code);
       setCopiedCode(true);
+      toastSuccess("Kode transaksi disalin!");
       setTimeout(() => setCopiedCode(false), 2000);
     }
   };

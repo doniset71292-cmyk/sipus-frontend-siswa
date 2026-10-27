@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { searchBooks, getBookDetail } from "../services/authService";
 import { pinjamBuku } from "../services/borrowService";
+import { confirmAction, alertSuccess, alertError } from "../utils/alert";
 
 export default function Katalog() {
   const [query, setQuery] = useState("");
@@ -62,6 +63,22 @@ export default function Katalog() {
   };
 
   const handleQuickPinjam = async (book) => {
+    const { confirmed } = await confirmAction({
+      title: "Pinjam Buku Ini?",
+      html: `
+        <div style="font-size: 0.9rem; text-align: left; margin-top: 0.5rem;">
+          <p>Apakah Anda ingin langsung mengajukan peminjaman buku:</p>
+          <p style="font-weight: 700; color: #1e293b; margin: 0.5rem 0;">"${book.title}"</p>
+          <p style="font-size: 0.8rem; color: #64748b;">Jumlah: 1 eksemplar</p>
+        </div>
+      `,
+      confirmText: "Ya, Ajukan Pinjam",
+      cancelText: "Batal",
+      icon: "question",
+    });
+
+    if (!confirmed) return;
+
     setPinjamMsg("");
     setPinjamLoading(true);
     const result = await pinjamBuku({
@@ -71,11 +88,27 @@ export default function Katalog() {
     setPinjamLoading(false);
 
     if (result.success && result.data) {
-      setPinjamMsg(
-        `Berhasil mengajukan peminjaman "${book.title}". Kode Transaksi: ${result.data.transaction_code}. Menunggu persetujuan petugas.`
-      );
+      alertSuccess({
+        title: "Pengajuan Berhasil!",
+        html: `
+          <div style="text-align: left; font-size: 0.875rem;">
+            <p>Peminjaman buku <strong>"${book.title}"</strong> berhasil diajukan.</p>
+            <div style="margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: #eff6ff; border-radius: 0.5rem; border: 1px solid #bfdbfe;">
+              <span style="font-size: 0.75rem; color: #1e40af;">Kode Transaksi:</span>
+              <div style="font-family: monospace; font-weight: 700; color: #1d4ed8; font-size: 1rem;">${result.data.transaction_code}</div>
+            </div>
+            <p style="margin-top: 0.75rem; font-size: 0.8rem; color: #64748b;">Silakan tunggu persetujuan petugas perpustakaan.</p>
+          </div>
+        `,
+        confirmText: "Buka Riwayat",
+      }).then(() => {
+        navigate("/riwayat-peminjaman");
+      });
     } else {
-      setPinjamMsg(result.message || "Gagal mengajukan peminjaman.");
+      alertError({
+        title: "Gagal Mengajukan",
+        text: result.message || "Terjadi kesalahan saat meminjam buku.",
+      });
     }
   };
 
