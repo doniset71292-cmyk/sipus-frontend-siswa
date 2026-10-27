@@ -6,12 +6,30 @@ const API_URL =
     ? "/api/v1"
     : "http://43.173.6.21:8080/api/v1");
 
-export async function getBooks(search = "", page = 1) {
+export async function getBooks(queryOrParams = "", page = 1) {
   try {
-    let url = `${API_URL}/books?page=${page}`;
-    if (search) {
-      url += `&search=${encodeURIComponent(search)}`;
+    let url = `${API_URL}/books`;
+    const params = new URLSearchParams();
+
+    if (typeof queryOrParams === "object" && queryOrParams !== null) {
+      if (queryOrParams.search) params.append("search", queryOrParams.search);
+      if (queryOrParams.page) params.append("page", queryOrParams.page);
+      if (queryOrParams.availableOnly || queryOrParams.available_only) {
+        params.append("available_only", "1");
+      }
+      if (queryOrParams.perPage || queryOrParams.per_page) {
+        params.append("per_page", queryOrParams.perPage || queryOrParams.per_page);
+      }
+    } else {
+      if (queryOrParams) params.append("search", queryOrParams);
+      if (page) params.append("page", page);
     }
+
+    const queryString = params.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+
     const res = await fetch(url, {
       headers: {
         ...authHeader(),

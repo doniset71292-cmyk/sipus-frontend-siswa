@@ -9,24 +9,35 @@ export default function Katalog() {
   const [books, setBooks] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [meta, setMeta] = useState(null);
   const [selected, setSelected] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [pinjamMsg, setPinjamMsg] = useState("");
   const [pinjamLoading, setPinjamLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Load awal semua buku
+  // Load buku saat page atau filter stok berubah
   useEffect(() => {
-    loadBooks();
-  }, []);
+    loadBooks(currentPage, availableOnly, query);
+  }, [currentPage, availableOnly]);
 
-  const loadBooks = async (searchQuery = "") => {
+  const loadBooks = async (page = currentPage, isAvailable = availableOnly, searchQuery = query) => {
     setSearchLoading(true);
     setError("");
-    const result = await searchBooks(searchQuery);
+    const result = await searchBooks({
+      search: searchQuery,
+      page,
+      availableOnly: isAvailable,
+      perPage: 9,
+    });
     setSearchLoading(false);
     if (result.success && Array.isArray(result.data)) {
       setBooks(result.data);
+      if (result.meta) {
+        setMeta(result.meta);
+      }
     } else {
       setError(result.message || "Gagal memuat katalog buku.");
     }
@@ -34,7 +45,11 @@ export default function Katalog() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    loadBooks(query);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      loadBooks(1, availableOnly, query);
+    }
   };
 
   const openDetail = async (id) => {
@@ -147,7 +162,8 @@ export default function Katalog() {
                 type="button"
                 onClick={() => {
                   setQuery("");
-                  loadBooks("");
+                  setCurrentPage(1);
+                  loadBooks(1, availableOnly, "");
                 }}
                 className="px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-200 transition-colors"
               >
@@ -155,6 +171,30 @@ export default function Katalog() {
               </button>
             )}
           </form>
+
+          {/* Filter Baris: Hanya Stok Tersedia & Info Total */}
+          <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 flex-wrap gap-3">
+            <label className="inline-flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={availableOnly}
+                onChange={(e) => {
+                  setAvailableOnly(e.target.checked);
+                  setCurrentPage(1);
+                }}
+                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              />
+              <span className="text-xs font-semibold text-slate-700">
+                Hanya tampilkan buku yang stoknya tersedia
+              </span>
+            </label>
+
+            {meta && (
+              <span className="text-xs text-slate-500">
+                Total: <strong>{meta.total}</strong> buku ditemukan
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Error message */}
@@ -251,6 +291,32 @@ export default function Katalog() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Paginasi Katalog */}
+        {meta && meta.last_page > 1 && (
+          <div className="mt-8 flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl border border-slate-200 shadow-xs">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1 || searchLoading}
+              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              &larr; Sebelumnya
+            </button>
+            <span className="text-xs font-semibold text-slate-700">
+              Halaman <span className="font-bold text-slate-900">{meta.current_page}</span> dari{" "}
+              <span className="font-bold text-slate-900">{meta.last_page}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(meta.last_page, p + 1))}
+              disabled={currentPage >= meta.last_page || searchLoading}
+              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Selanjutnya &rarr;
+            </button>
           </div>
         )}
 

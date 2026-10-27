@@ -45,11 +45,30 @@ export async function loginSiswa(nis, password) {
   }
 }
 
-export async function searchBooks(query = "") {
+export async function searchBooks(queryOrParams = "", page = 1) {
   try {
-    const url = query
-      ? `${API_URL}/books?search=${encodeURIComponent(query)}`
-      : `${API_URL}/books`;
+    let url = `${API_URL}/books`;
+    const params = new URLSearchParams();
+
+    if (typeof queryOrParams === "object" && queryOrParams !== null) {
+      if (queryOrParams.search) params.append("search", queryOrParams.search);
+      if (queryOrParams.page) params.append("page", queryOrParams.page);
+      if (queryOrParams.availableOnly || queryOrParams.available_only) {
+        params.append("available_only", "1");
+      }
+      if (queryOrParams.perPage || queryOrParams.per_page) {
+        params.append("per_page", queryOrParams.perPage || queryOrParams.per_page);
+      }
+    } else {
+      if (queryOrParams) params.append("search", queryOrParams);
+      if (page) params.append("page", page);
+    }
+
+    const queryString = params.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+
     const res = await fetch(url, {
       headers: {
         ...authHeader(),
