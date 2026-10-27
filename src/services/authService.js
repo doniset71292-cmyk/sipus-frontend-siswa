@@ -120,7 +120,23 @@ export async function pinjamBuku(bookId, quantity = 1, notes = "", customDueDate
   }
 }
 
-export function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+export async function logout() {
+  try {
+    const token = localStorage.getItem("token");
+    if (token) {
+      await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+    }
+  } catch {
+    // Abaikan jika network error saat logout
+  } finally {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+  }
 }
+

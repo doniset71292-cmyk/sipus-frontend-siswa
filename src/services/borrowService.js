@@ -156,8 +156,13 @@ export function getStatusBadge(status, isOverdue = false) {
         bgClass: "bg-amber-100 text-amber-800 border-amber-200",
         dotClass: "bg-amber-500",
       };
-    case "BORROWED":
     case "APPROVED":
+      return {
+        label: "Disetujui (Siap Diambil)",
+        bgClass: "bg-indigo-100 text-indigo-800 border-indigo-200",
+        dotClass: "bg-indigo-500",
+      };
+    case "BORROWED":
       return {
         label: "Sedang Dipinjam",
         bgClass: "bg-blue-100 text-blue-800 border-blue-200",

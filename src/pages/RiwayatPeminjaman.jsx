@@ -49,6 +49,7 @@ export default function RiwayatPeminjaman() {
   // Hitung ringkasan statistik
   const stats = useMemo(() => {
     let pending = 0;
+    let approved = 0;
     let borrowed = 0;
     let returned = 0;
     let overdue = 0;
@@ -57,13 +58,15 @@ export default function RiwayatPeminjaman() {
       const st = (b.status || "").toUpperCase();
       if (b.is_overdue && st !== "RETURNED") overdue++;
       if (st === "PENDING") pending++;
-      else if (st === "BORROWED" || st === "APPROVED") borrowed++;
+      else if (st === "APPROVED") approved++;
+      else if (st === "BORROWED") borrowed++;
       else if (st === "RETURNED") returned++;
     });
 
     return {
       total: borrowings.length,
       pending,
+      approved,
       borrowed,
       returned,
       overdue,
@@ -76,7 +79,8 @@ export default function RiwayatPeminjaman() {
       // 1. Filter status
       const st = (item.status || "").toUpperCase();
       if (statusFilter === "PENDING" && st !== "PENDING") return false;
-      if (statusFilter === "BORROWED" && st !== "BORROWED" && st !== "APPROVED") return false;
+      if (statusFilter === "APPROVED" && st !== "APPROVED") return false;
+      if (statusFilter === "BORROWED" && st !== "BORROWED") return false;
       if (statusFilter === "RETURNED" && st !== "RETURNED") return false;
       if (statusFilter === "OVERDUE" && (!item.is_overdue || st === "RETURNED")) return false;
 
@@ -243,6 +247,7 @@ export default function RiwayatPeminjaman() {
               {[
                 { key: "ALL", label: "Semua" },
                 { key: "PENDING", label: `Menunggu (${stats.pending})` },
+                ...(stats.approved > 0 ? [{ key: "APPROVED", label: `Siap Diambil (${stats.approved})` }] : []),
                 { key: "BORROWED", label: `Dipinjam (${stats.borrowed})` },
                 { key: "RETURNED", label: `Selesai (${stats.returned})` },
                 ...(stats.overdue > 0 ? [{ key: "OVERDUE", label: `Terlambat (${stats.overdue})` }] : []),
@@ -544,6 +549,16 @@ export default function RiwayatPeminjaman() {
                 {copiedCode ? "Tersalin!" : "Salin Kode"}
               </button>
             </div>
+
+            {selectedBorrowing.status === "APPROVED" && (
+              <div className="p-3.5 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 mb-5 flex items-start gap-2.5">
+                <span className="text-base leading-none">🎉</span>
+                <div>
+                  <strong className="block mb-0.5">Pengajuan Telah Disetujui!</strong>
+                  Buku sudah disiapkan oleh petugas. Silakan datang ke perpustakaan dan tunjukkan kode transaksi ini kepada petugas untuk mengambil buku.
+                </div>
+              </div>
+            )}
 
             {/* Detail Timeline */}
             <div className="space-y-3 text-sm pb-5 border-b border-slate-100">

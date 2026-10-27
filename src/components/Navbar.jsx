@@ -9,9 +9,9 @@ export default function Navbar() {
   const navigate = useNavigate();
   const user = getCurrentUser();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm("Apakah Anda yakin ingin keluar?")) {
-      logout();
+      await logout();
       navigate("/login-siswa");
     }
   };
