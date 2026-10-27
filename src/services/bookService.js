@@ -1,9 +1,10 @@
 import { authHeader } from "./authService";
 
 const API_URL =
-  typeof window !== "undefined" && window.location.protocol === "https:"
+  import.meta.env.VITE_API_URL ||
+  (typeof window !== "undefined" && window.location.protocol === "https:"
     ? "/api/v1"
-    : "http://43.173.6.21:8080/api/v1";
+    : "http://43.173.6.21:8080/api/v1");
 
 export async function getBooks(search = "", page = 1) {
   try {

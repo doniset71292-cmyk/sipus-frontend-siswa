@@ -1,0 +1,39 @@
+name: Deploy Frontend Siswa
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Build Production
+        run: npm run build
+        env:
+          VITE_API_URL: http://43.173.6.21:8080/api/v1
+
+      - name: Deploy build to VPS
+        uses: easingthemes/ssh-deploy@v5.1.0
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.VPS_HOST }}
+          REMOTE_USER: ${{ secrets.VPS_USER }}
+          SOURCE: "dist/"
+          TARGET: "/var/www/sipus-frontend-siswa/dist/"
+          ARGS: "-rlgoDzc -i --delete"
