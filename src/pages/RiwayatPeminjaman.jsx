@@ -335,13 +335,13 @@ export default function RiwayatPeminjaman() {
               return (
                 <div
                   key={item.id}
-                  className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all p-5 sm:p-6"
+                  className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all p-4 sm:p-5"
                 >
                   {/* Top Bar Card */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                    <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-100">
+                    <div className="flex flex-wrap items-center gap-2.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-slate-600 uppercase font-semibold">Kode:</span>
+                        <span className="text-xs text-slate-500 uppercase font-semibold">Kode:</span>
                         <span className="font-mono font-bold text-slate-900 text-sm sm:text-base">
                           {item.transaction_code}
                         </span>
@@ -349,7 +349,7 @@ export default function RiwayatPeminjaman() {
                           type="button"
                           onClick={() => copyCode(item.transaction_code)}
                           title="Salin kode"
-                          className="p-1 text-slate-600 hover:text-blue-600 rounded hover:bg-slate-100"
+                          className="p-1 text-slate-400 hover:text-blue-600 rounded hover:bg-slate-100"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -358,15 +358,15 @@ export default function RiwayatPeminjaman() {
                       </div>
 
                       <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.bgClass}`}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${badge.bgClass}`}
                       >
                         <span className={`w-2 h-2 rounded-full ${badge.dotClass}`} />
                         <span>{badge.label}</span>
                       </span>
                     </div>
 
-                    <div className="text-xs text-slate-600 flex items-center gap-1">
-                      <svg className="w-4 h-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="text-xs text-slate-500 flex items-center gap-1">
+                      <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <span>Diajukan: {formatIndoDate(item.created_at, true)}</span>
@@ -374,9 +374,9 @@ export default function RiwayatPeminjaman() {
                   </div>
 
                   {/* Body Card: Buku yang dipinjam & Timeline Tanggal */}
-                  <div className="py-4 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                  <div className="py-3 grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 items-center">
                     {/* Daftar Buku */}
-                    <div className="md:col-span-2 space-y-3">
+                    <div className="md:col-span-2 space-y-2.5">
                       {itemsList.map((it) => {
                         const book = it.book || {};
                         return (
@@ -385,13 +385,13 @@ export default function RiwayatPeminjaman() {
                               <img
                                 src={book.cover}
                                 alt={book.title}
-                                className="w-14 h-20 object-cover rounded-lg border border-slate-200 shrink-0 shadow-xs"
+                                className="w-13 h-18 object-cover rounded-lg border border-slate-200 shrink-0 shadow-xs"
                                 onError={(e) => {
                                   e.target.style.display = "none";
                                 }}
                               />
                             ) : (
-                              <div className="w-14 h-20 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 font-bold text-[10px] flex items-center justify-center shrink-0">
+                              <div className="w-13 h-18 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 font-bold text-[10px] flex items-center justify-center shrink-0">
                                 BUKU
                               </div>
                             )}
@@ -400,16 +400,16 @@ export default function RiwayatPeminjaman() {
                               <h4 className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
                                 {book.title || "Judul Buku"}
                               </h4>
-                              <p className="text-xs text-slate-600 mt-0.5">
+                              <p className="text-xs text-slate-500 mt-0.5">
                                 Penulis: <span className="font-medium text-slate-700">{book.author || "-"}</span> | Penerbit:{" "}
                                 <span className="font-medium text-slate-700">{book.publisher || "-"}</span>
                               </p>
-                              <div className="flex flex-wrap items-center gap-2 mt-2">
+                              <div className="flex flex-wrap items-center gap-2 mt-1.5">
                                 <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium">
                                   Jumlah: {it.quantity} buku
                                 </span>
                                 {book.isbn && (
-                                  <span className="text-xs text-slate-600 font-mono">
+                                  <span className="text-xs text-slate-500 font-mono">
                                     ISBN: {book.isbn}
                                   </span>
                                 )}
@@ -420,25 +420,25 @@ export default function RiwayatPeminjaman() {
                       })}
 
                       {item.notes && (
-                        <div className="mt-3 p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-600">
-                          <span className="font-semibold text-slate-700 block mb-0.5">Catatan Keperluan:</span>
-                          <p className="italic">"{item.notes}"</p>
+                        <div className="mt-2 px-3 py-1.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs text-slate-600 flex items-baseline gap-1.5">
+                          <span className="font-semibold text-slate-700 shrink-0">Catatan:</span>
+                          <p className="italic text-slate-600">"{item.notes}"</p>
                         </div>
                       )}
                     </div>
 
-                    {/* Timeline & Informasi Tanggal */}
-                    <div className="bg-slate-50/70 p-4 rounded-xl border border-slate-200/80 space-y-2.5 text-xs">
-                      <div>
-                        <span className="text-slate-600 block">Batas Pengembalian:</span>
-                        <span className="font-bold text-slate-900 text-sm block">
+                    {/* Timeline & Informasi Tanggal (Compact Key-Value Box) */}
+                    <div className="bg-slate-50/80 p-3 sm:p-3.5 rounded-xl border border-slate-200/80 space-y-2 text-xs">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-slate-500 font-medium">Batas Pengembalian:</span>
+                        <span className={`font-bold text-sm ${item.is_overdue && item.status !== "RETURNED" ? "text-red-600" : "text-slate-900"}`}>
                           {formatIndoDate(item.due_date)}
                         </span>
                       </div>
 
                       {item.borrowed_at && (
-                        <div>
-                          <span className="text-slate-600 block">Tanggal Diambil:</span>
+                        <div className="flex items-baseline justify-between gap-2 pt-1.5 border-t border-slate-200/60">
+                          <span className="text-slate-500 font-medium">Tanggal Diambil:</span>
                           <span className="font-semibold text-slate-800">
                             {formatIndoDate(item.borrowed_at, true)}
                           </span>
@@ -446,8 +446,8 @@ export default function RiwayatPeminjaman() {
                       )}
 
                       {item.returned_at && (
-                        <div>
-                          <span className="text-slate-600 block">Tanggal Dikembalikan:</span>
+                        <div className="flex items-baseline justify-between gap-2 pt-1.5 border-t border-slate-200/60">
+                          <span className="text-slate-500 font-medium">Tanggal Dikembalikan:</span>
                           <span className="font-semibold text-emerald-700">
                             {formatIndoDate(item.returned_at, true)}
                           </span>
@@ -455,26 +455,26 @@ export default function RiwayatPeminjaman() {
                       )}
 
                       {item.is_overdue && item.status !== "RETURNED" && (
-                        <div className="p-2 bg-red-100 text-red-800 rounded-lg font-semibold flex items-center gap-1.5 mt-2">
-                          <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="p-1.5 bg-red-100 text-red-800 rounded-lg font-semibold flex items-center gap-1 mt-1 text-[11px]">
+                          <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>Peminjaman melewati batas tempo!</span>
+                          <span>Melewati batas tempo!</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* Footer Card */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs text-slate-600">
+                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-xs text-slate-500">
                       ID Transaksi #{item.id}
                     </span>
 
                     <button
                       type="button"
                       onClick={() => setSelectedBorrowing(item)}
-                      className="px-4 py-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1"
+                      className="px-3.5 py-1 text-xs font-bold text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1"
                     >
                       <span>Lihat Detail Lengkap</span>
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
