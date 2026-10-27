@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GraduationCap, Lock, Eye, EyeOff, AlertCircle, Loader2, BookOpen, ExternalLink } from "lucide-react";
+import { GraduationCap, Lock, Eye, EyeOff, AlertCircle, Loader2, BookOpen } from "lucide-react";
 import { loginSiswa } from "../services/authService";
 import { toastSuccess } from "../utils/alert";
 import logoImg from "../assets/logo.png";
@@ -28,7 +28,7 @@ export default function LoginSiswa() {
         const token = result.data.token;
 
         if (user.role !== "student") {
-          setError("Akun ini bukan akun siswa. Silakan masuk melalui Portal Petugas.");
+          setError("Akun ini bukan akun siswa. Akses hanya untuk siswa sekolah.");
           return;
         }
 
@@ -168,17 +168,8 @@ export default function LoginSiswa() {
         </div>
 
         {/* Footer */}
-        <div className="pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-          <span>© 2026 SIPUS • SMKS TI ANNISA 2</span>
-          <a
-            href="http://43.173.6.21:8080/"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1 text-slate-500 hover:text-blue-600 transition-colors"
-          >
-            <span>Portal Petugas</span>
-            <ExternalLink size={11} />
-          </a>
+        <div className="pt-6 border-t border-slate-100 text-xs text-slate-400">
+          © 2026 SIPUS • Sistem Informasi Perpustakaan Sekolah
         </div>
       </div>
 
