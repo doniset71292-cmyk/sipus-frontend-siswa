@@ -1,161 +1,225 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GraduationCap, Lock, Eye, EyeOff, AlertCircle, Loader2, BookOpen, ExternalLink } from "lucide-react";
 import { loginSiswa } from "../services/authService";
+import { toastSuccess } from "../utils/alert";
 import logoImg from "../assets/logo.png";
+import loginBg from "../assets/login-bg.jpg";
 
 export default function LoginSiswa() {
-  const [identity_number, setIdentity] = useState("");
+  const [identityNumber, setIdentityNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    const result = await loginSiswa(identity_number, password);
-    setLoading(false);
+    try {
+      const result = await loginSiswa(identityNumber.trim(), password);
+      setLoading(false);
 
-    if (result.success) {
-      const user = result.data.user;
-      const token = result.data.token;
+      if (result.success) {
+        const user = result.data.user;
+        const token = result.data.token;
 
-      if (user.role !== "student") {
-        setError("Ini halaman khusus siswa.");
-        return;
+        if (user.role !== "student") {
+          setError("Akun ini bukan akun siswa. Silakan masuk melalui Portal Petugas.");
+          return;
+        }
+
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+        toastSuccess(`Selamat datang, ${user.name || "Siswa"}!`);
+        navigate("/katalog");
+      } else {
+        setError(result.message || "NIS atau password salah");
       }
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      navigate("/katalog");
-    } else {
-      setError(result.message || "NIS atau password salah");
+    } catch {
+      setLoading(false);
+      setError("Tidak dapat terhubung ke server perpustakaan");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-        <div className="flex justify-center mb-4">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-white">
+      {/* Kolom Kiri: Sidebar Form Login Siswa (Minimalis, Rapi, Fokus) */}
+      <div className="w-full lg:w-[420px] xl:w-[460px] 2xl:w-[480px] lg:shrink-0 flex flex-col justify-between p-6 sm:p-8 lg:p-10 xl:p-12 border-r border-slate-100 z-10 bg-white">
+        {/* Top Header Branding */}
+        <div className="flex items-center gap-3">
           <img
             src={logoImg}
             alt="Logo SIPUS"
-            className="w-18 h-18 rounded-2xl object-contain shadow-md shadow-blue-500/10 border border-slate-100"
+            className="w-10 h-10 rounded-xl object-contain shadow-2xs border border-slate-100"
           />
-        </div>
-        <h1 className="text-2xl font-bold text-center text-slate-900">SIPUS - Login Siswa</h1>
-        <p className="text-sm text-gray-500 text-center mb-6">Sistem Informasi Perpustakaan Sekolah</p>
-
-        {error && <p className="bg-red-100 text-red-700 p-3 rounded-lg text-sm mb-4">{error}</p>}
-
-        <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">NIS</label>
-            <div className="relative flex items-center">
-              <svg 
-                className="absolute left-3 w-5 h-5 text-slate-400 pointer-events-none" 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <input
-                type="text"
-                value={identity_number}
-                onChange={(e) => setIdentity(e.target.value)}
-                placeholder="Contoh: 202410001"
-                required
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-lg text-slate-900 tracking-tight leading-none">
+                SIPUS
+              </span>
+              <span className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 uppercase border border-blue-200/60 leading-none">
+                Siswa Portal
+              </span>
             </div>
+            <p className="text-xs text-slate-500 font-medium mt-1">
+              Sistem Informasi Perpustakaan Sekolah
+            </p>
+          </div>
+        </div>
+
+        {/* Center Section: Form */}
+        <div className="my-10 lg:my-0 max-w-md w-full mx-auto">
+          <div className="mb-7">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              Selamat Datang, Siswa
+            </h1>
+            <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+              Masuk dengan Nomor Induk Siswa (NIS) untuk meminjam buku dan menjelajahi katalog perpustakaan.
+            </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
-            <div className="relative flex items-center">
-              {/* Ikon Gembok di Kiri */}
-              <svg 
-                className="absolute left-3 w-5 h-5 text-slate-400 pointer-events-none" 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                strokeWidth="2"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+          {/* Error Message */}
+          {error && (
+            <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200/80 flex items-start gap-2.5 text-xs text-rose-800">
+              <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
+              <span className="leading-relaxed font-medium">{error}</span>
+            </div>
+          )}
 
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Masukkan password"
-                required
-                className="w-full pl-10 pr-11 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Input NIS */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5 tracking-tight">
+                Nomor Induk Siswa (NIS) <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <GraduationCap size={17} />
+                </div>
+                <input
+                  type="text"
+                  value={identityNumber}
+                  onChange={(e) => setIdentityNumber(e.target.value)}
+                  placeholder="Contoh: 202410001"
+                  required
+                  autoComplete="username"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white text-slate-900 text-sm pl-10 pr-3.5 py-2.5 transition-all duration-150 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400 shadow-2xs font-medium"
+                />
+              </div>
+            </div>
 
-              {/* Tombol Toggle Ikon Mata di Kanan */}
+            {/* Input Password */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5 tracking-tight">
+                Password <span className="text-rose-500">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock size={16} />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white focus:bg-white text-slate-900 text-sm pl-10 pr-10 py-2.5 transition-all duration-150 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/10 placeholder:text-slate-400 shadow-2xs font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 p-1 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
-                aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
-                title={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                type="submit"
+                disabled={loading}
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold shadow-xs hover:shadow-md transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {showPassword ? (
-                  /* Ikon Mata Dicoret (Sembunyikan) */
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                    />
-                  </svg>
+                {loading ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Memverifikasi...</span>
+                  </>
                 ) : (
-                  /* Ikon Mata Terbuka (Tampilkan) */
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
+                  <span>Masuk ke Katalog Buku</span>
                 )}
               </button>
             </div>
+          </form>
+
+          {/* Student Helper Info */}
+          <div className="mt-6 p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-2.5 text-xs text-slate-500">
+            <BookOpen size={16} className="text-blue-600 shrink-0" />
+            <span>Peminjaman buku sekolah kini lebih mudah secara daring.</span>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+          <span>© 2026 SIPUS • SMKS TI ANNISA 2</span>
+          <a
+            href="http://43.173.6.21:8080/"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-slate-500 hover:text-blue-600 transition-colors"
+          >
+            <span>Portal Petugas</span>
+            <ExternalLink size={11} />
+          </a>
+        </div>
+      </div>
+
+      {/* Kolom Kanan: Visual Hero Panel Luas (Literasi & Pembelajaran Siswa) */}
+      <div className="hidden lg:relative lg:flex lg:flex-1 bg-slate-950 overflow-hidden">
+        <img
+          src={loginBg}
+          alt="Gedung SMKS TI ANNISA 2"
+          className="absolute inset-0 w-full h-full object-cover object-center scale-102"
+        />
+        {/* Deep Slate-Blue Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-blue-950/30" />
+
+        {/* Hero Overlay Content */}
+        <div className="relative z-10 mt-auto p-12 lg:p-16 xl:p-20 text-white max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-medium text-white mb-4">
+            <GraduationCap size={14} className="text-blue-300" />
+            <span>Portal Belajar & Literasi Siswa</span>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-xs cursor-pointer"
-          >
-            {loading ? "Loading..." : "Masuk"}
-          </button>
-        </form>
+          <h2 className="text-2xl xl:text-3xl font-bold tracking-tight leading-snug text-white">
+            "Buku Adalah Jendela Dunia, Membaca Adalah Kuncinya."
+          </h2>
+
+          <p className="mt-3 text-sm text-slate-200/90 leading-relaxed font-normal">
+            Temukan beragam referensi pelajaran, modul kejuruan, dan bacaan inspiratif untuk menunjang prestasimu di sekolah.
+          </p>
+
+          {/* Minimalist Feature Badges Khusus Siswa */}
+          <div className="mt-6 flex flex-wrap gap-2 text-xs text-slate-200">
+            <span className="px-3 py-1 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10">
+              ✓ Koleksi 50+ Buku
+            </span>
+            <span className="px-3 py-1 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10">
+              ✓ Bebas Antre di Perpus
+            </span>
+            <span className="px-3 py-1 rounded-lg bg-black/40 backdrop-blur-sm border border-white/10">
+              ✓ Pantau Batas Pengembalian
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
