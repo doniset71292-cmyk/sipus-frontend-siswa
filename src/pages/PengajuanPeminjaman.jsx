@@ -356,11 +356,10 @@ export default function PengajuanPeminjaman() {
                             ISBN: {selectedBook.isbn || "-"}
                           </span>
                           <span
-                            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                              selectedBook.stock > 0
+                            className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${selectedBook.stock > 0
                                 ? "bg-emerald-100 text-emerald-800"
                                 : "bg-red-100 text-red-800"
-                            }`}
+                              }`}
                           >
                             Stok Tersedia: {selectedBook.stock ?? "-"}
                           </span>
@@ -635,11 +634,10 @@ export default function PengajuanPeminjaman() {
                     <div
                       key={book.id}
                       onClick={() => !isOutOfStock && handleSelectBook(book)}
-                      className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all ${
-                        isOutOfStock
+                      className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all ${isOutOfStock
                           ? "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"
                           : "border-slate-200 hover:border-blue-500 hover:bg-blue-50/40 cursor-pointer"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         {book.cover ? (
@@ -663,13 +661,12 @@ export default function PengajuanPeminjaman() {
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <span
-                              className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                                isOutOfStock
+                              className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${isOutOfStock
                                   ? "bg-red-100 text-red-700"
                                   : "bg-emerald-100 text-emerald-700"
-                              }`}
+                                }`}
                             >
-                              {isOutOfStock ? "Stok Habis" : `Tersedia: ${book.stock} exp`}
+                              {isOutOfStock ? "Stok Habis" : `Tersedia: ${book.stock}`}
                             </span>
                           </div>
                         </div>
@@ -678,11 +675,10 @@ export default function PengajuanPeminjaman() {
                       <button
                         type="button"
                         disabled={isOutOfStock}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 ${
-                          isOutOfStock
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 ${isOutOfStock
                             ? "bg-slate-200 text-slate-600 cursor-not-allowed"
                             : "bg-blue-600 text-white hover:bg-blue-700"
-                        }`}
+                          }`}
                       >
                         {isOutOfStock ? "Habis" : "Pilih"}
                       </button>

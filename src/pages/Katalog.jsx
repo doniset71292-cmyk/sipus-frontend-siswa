@@ -205,13 +205,12 @@ export default function Katalog() {
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <span
-                          className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-bold mb-1.5 ${
-                            hasStock
+                          className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-bold mb-1.5 ${hasStock
                               ? "bg-emerald-100 text-emerald-800"
                               : "bg-red-100 text-red-800"
-                          }`}
+                            }`}
                         >
-                          {hasStock ? `Stok: ${book.stock ?? 1} exp` : "Stok Habis"}
+                          {hasStock ? `Stok: ${book.stock ?? 1}` : "Stok Habis"}
                         </span>
                         <h3 className="font-bold text-slate-900 text-base leading-snug line-clamp-2">
                           {book.title}
@@ -288,11 +287,10 @@ export default function Katalog() {
 
                     <div className="flex-1">
                       <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 ${
-                          selected.stock > 0
+                        className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 ${selected.stock > 0
                             ? "bg-emerald-100 text-emerald-800"
                             : "bg-red-100 text-red-800"
-                        }`}
+                          }`}
                       >
                         {selected.stock > 0 ? `Stok: ${selected.stock} Buku` : "Stok Habis"}
                       </span>
