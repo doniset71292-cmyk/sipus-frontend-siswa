@@ -294,6 +294,9 @@ export default function Katalog() {
                         <p className="text-xs text-slate-600 line-clamp-1">
                           Penerbit: {book.publisher || "-"}
                         </p>
+                        <p className="text-xs text-slate-600 mt-1">
+                          Lokasi Rak: <span className="font-semibold text-slate-800">{book.rack_location || "Belum tersedia"}</span>
+                        </p>
                       </div>
 
                       {book.publication_year && (
@@ -401,6 +404,9 @@ export default function Katalog() {
                       </p>
                       <p className="text-sm text-slate-600">
                         Penerbit: <span className="font-semibold text-slate-800">{selected.publisher || "-"}</span> ({selected.publication_year || "-"})
+                      </p>
+                      <p className="text-sm text-slate-600 mt-1">
+                        Lokasi Rak: <span className="font-semibold text-slate-800">{selected.rack_location || "Belum tersedia"}</span>
                       </p>
                       {selected.isbn && (
                         <p className="text-xs text-slate-600 font-mono mt-1">

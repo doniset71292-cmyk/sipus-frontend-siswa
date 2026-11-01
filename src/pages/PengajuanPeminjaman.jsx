@@ -603,6 +603,7 @@ export default function PengajuanPeminjaman() {
                 <li>Setelah mengajukan, tunjukkan kode transaksi ke petugas untuk verifikasi.</li>
                 <li>Wajib menjaga keutuhan dan kebersihan buku yang dipinjam.</li>
                 <li>Keterlambatan pengembalian buku dapat dikenakan sanksi tata tertib perpustakaan.</li>
+                <li>Jika buku tidak ada di rak fisiknya, silakan hubungi petugas loket (kemungkinan buku baru dikembalikan dan belum selesai ditata).</li>
               </ul>
             </div>
           </div>
