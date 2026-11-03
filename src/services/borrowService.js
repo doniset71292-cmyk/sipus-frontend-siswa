@@ -55,6 +55,27 @@ export async function getBorrowingDetail(id) {
 }
 
 /**
+ * Membatalkan pengajuan peminjaman
+ * @param {number|string} id
+ */
+export async function cancelBorrowing(id) {
+  try {
+    const res = await fetch(`${API_URL}/borrowings/${id}/cancel`, {
+      method: "POST",
+      headers: {
+        ...authHeader(),
+      },
+    });
+    return await res.json();
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message || "Gagal membatalkan pengajuan peminjaman",
+    };
+  }
+}
+
+/**
  * Mengajukan peminjaman buku baru
  * @param {Object} payload
  * @param {number|string} payload.bookId ID buku yang dipinjam
@@ -141,7 +162,7 @@ export function formatIndoDate(dateString, includeTime = false) {
 export function getStatusBadge(status, isOverdue = false) {
   const normStatus = (status || "").toUpperCase();
 
-  if (isOverdue && normStatus !== "RETURNED") {
+  if (isOverdue && !["RETURNED", "CANCELLED"].includes(normStatus)) {
     return {
       label: "Terlambat",
       bgClass: "bg-red-100 text-red-800 border-red-200",
@@ -179,6 +200,12 @@ export function getStatusBadge(status, isOverdue = false) {
         label: "Ditolak",
         bgClass: "bg-rose-100 text-rose-800 border-rose-200",
         dotClass: "bg-rose-500",
+      };
+    case "CANCELLED":
+      return {
+        label: "Dibatalkan",
+        bgClass: "bg-slate-100 text-slate-600 border-slate-300",
+        dotClass: "bg-slate-400",
       };
     default:
       return {

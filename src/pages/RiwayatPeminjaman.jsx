@@ -1,8 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { getMyBorrowings, formatIndoDate, getStatusBadge } from "../services/borrowService";
-import { toastSuccess } from "../utils/alert";
+import {
+  cancelBorrowing,
+  getMyBorrowings,
+  formatIndoDate,
+  getStatusBadge,
+} from "../services/borrowService";
+import { confirmAction, toastError, toastSuccess } from "../utils/alert";
 
 export default function RiwayatPeminjaman() {
   const [borrowings, setBorrowings] = useState([]);
@@ -18,6 +23,7 @@ export default function RiwayatPeminjaman() {
   // Detail Modal
   const [selectedBorrowing, setSelectedBorrowing] = useState(null);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [cancellingId, setCancellingId] = useState(null);
 
   useEffect(() => {
     fetchHistory(currentPage);
@@ -48,6 +54,41 @@ export default function RiwayatPeminjaman() {
     }
   };
 
+  const handleCancelBorrowing = async (borrowing) => {
+    const { confirmed } = await confirmAction({
+      title: "Batalkan Pengajuan?",
+      text: "Pengajuan peminjaman ini akan dibatalkan.",
+      confirmText: "Ya, Batalkan",
+      cancelText: "Kembali",
+      icon: "warning",
+      danger: true,
+    });
+
+    if (!confirmed) return;
+
+    setCancellingId(borrowing.id);
+    const result = await cancelBorrowing(borrowing.id);
+    setCancellingId(null);
+
+    if (!result.success) {
+      toastError(result.message || "Gagal membatalkan pengajuan.");
+      return;
+    }
+
+    const updatedBorrowing = {
+      ...borrowing,
+      ...(result.data && typeof result.data === "object" ? result.data : {}),
+      status: "CANCELLED",
+    };
+    setBorrowings((current) =>
+      current.map((item) => (item.id === borrowing.id ? updatedBorrowing : item))
+    );
+    setSelectedBorrowing((current) =>
+      current?.id === borrowing.id ? updatedBorrowing : current
+    );
+    toastSuccess("Pengajuan berhasil dibatalkan.");
+  };
+
   // Hitung ringkasan statistik
   const stats = useMemo(() => {
     let pending = 0;
@@ -58,7 +99,7 @@ export default function RiwayatPeminjaman() {
 
     borrowings.forEach((b) => {
       const st = (b.status || "").toUpperCase();
-      if (b.is_overdue && st !== "RETURNED") overdue++;
+      if (b.is_overdue && !["RETURNED", "CANCELLED"].includes(st)) overdue++;
       if (st === "PENDING") pending++;
       else if (st === "APPROVED") approved++;
       else if (st === "BORROWED") borrowed++;
@@ -84,7 +125,10 @@ export default function RiwayatPeminjaman() {
       if (statusFilter === "APPROVED" && st !== "APPROVED") return false;
       if (statusFilter === "BORROWED" && st !== "BORROWED") return false;
       if (statusFilter === "RETURNED" && st !== "RETURNED") return false;
-      if (statusFilter === "OVERDUE" && (!item.is_overdue || st === "RETURNED")) return false;
+      if (
+        statusFilter === "OVERDUE" &&
+        (!item.is_overdue || ["RETURNED", "CANCELLED"].includes(st))
+      ) return false;
 
       // 2. Filter query pencarian
       if (!searchQuery.trim()) return true;
@@ -439,11 +483,19 @@ export default function RiwayatPeminjaman() {
                         </div>
                         <div className="flex-1 flex items-baseline justify-between gap-2">
                           <span className="text-slate-500 font-medium">Batas Kembali:</span>
-                          <span className={`font-bold text-sm ${item.is_overdue && item.status !== "RETURNED" ? "text-red-600" : "text-slate-900"}`}>
+                          <span className={`font-bold text-sm ${item.is_overdue && !["RETURNED", "CANCELLED"].includes(item.status?.toUpperCase()) ? "text-red-600" : "text-slate-900"}`}>
                             {formatIndoDate(item.due_date)}
                           </span>
                         </div>
                       </div>
+
+                      {item.status?.toUpperCase() === "APPROVED" && (
+                        <div className="p-2.5 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-900">
+                          Pengajuan Anda disetujui! Silakan ambil buku di perpustakaan sebelum{" "}
+                          <strong>{formatIndoDate(item.pickup_deadline)}</strong> (1 hari sekolah).
+                          Jika tidak diambil, pengajuan akan dibatalkan otomatis.
+                        </div>
+                      )}
 
                       {/* Tanggal Diambil */}
                       {item.borrowed_at && (
@@ -480,7 +532,8 @@ export default function RiwayatPeminjaman() {
                       )}
 
                       {/* Peringatan Keterlambatan */}
-                      {item.is_overdue && item.status !== "RETURNED" && (
+                      {item.is_overdue &&
+                        !["RETURNED", "CANCELLED"].includes(item.status?.toUpperCase()) && (
                         <div className="p-1.5 bg-red-50 text-red-700 rounded-lg font-semibold flex items-center gap-1.5 mt-1 text-[11px] border border-red-200">
                           <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -576,12 +629,14 @@ export default function RiwayatPeminjaman() {
               </button>
             </div>
 
-            {selectedBorrowing.status === "APPROVED" && (
+            {selectedBorrowing.status?.toUpperCase() === "APPROVED" && (
               <div className="p-3.5 bg-indigo-50 border border-indigo-200 rounded-xl text-xs text-indigo-900 mb-5 flex items-start gap-2.5">
                 <span className="text-base leading-none">🎉</span>
                 <div>
-                  <strong className="block mb-0.5">Pengajuan Telah Disetujui!</strong>
-                  Buku sudah disiapkan oleh petugas. Silakan datang ke perpustakaan dan tunjukkan kode transaksi ini kepada petugas untuk mengambil buku.
+                  <strong className="block mb-0.5">Pengajuan Anda disetujui!</strong>
+                  Silakan ambil buku di perpustakaan sebelum{" "}
+                  <strong>{formatIndoDate(selectedBorrowing.pickup_deadline)}</strong> (1 hari sekolah).
+                  Jika tidak diambil, pengajuan akan dibatalkan otomatis.
                 </div>
               </div>
             )}
@@ -655,6 +710,18 @@ export default function RiwayatPeminjaman() {
             )}
 
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+              {["PENDING", "APPROVED"].includes(
+                selectedBorrowing.status?.toUpperCase()
+              ) && (
+                <button
+                  type="button"
+                  onClick={() => handleCancelBorrowing(selectedBorrowing)}
+                  disabled={cancellingId === selectedBorrowing.id}
+                  className="px-5 py-2.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-sm font-semibold hover:bg-rose-100 disabled:opacity-50 transition-colors"
+                >
+                  {cancellingId === selectedBorrowing.id ? "Membatalkan..." : "Batalkan"}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setSelectedBorrowing(null)}
