@@ -4,10 +4,17 @@
    SweetAlert2 Custom Modern Styling for SIPUS Siswa
    =================================================================== */
 
-/* Latar gelap di belakang dialog */
-body .swal2-container.swal2-backdrop-show {
+/* Latar gelap HANYA di belakang modal/dialog konfirmasi, BUKAN untuk toast */
+body:not(.swal2-toast-shown) .swal2-container.swal2-backdrop-show {
   background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(2px);
+}
+
+/* Pastikan container notifikasi toast selalu transparan tanpa strip gelap */
+body.swal2-toast-shown .swal2-container,
+body.swal2-toast-shown .swal2-container.swal2-backdrop-show {
+  background: transparent !important;
+  backdrop-filter: none !important;
 }
 
 /* Kartu dialog */

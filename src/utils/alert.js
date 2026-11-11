@@ -19,6 +19,7 @@ const Toast = Swal.mixin({
   showConfirmButton: false,
   timer: 2500,
   timerProgressBar: true,
+  backdrop: false,
   customClass: { popup: "sipus-toast" },
 });
 
