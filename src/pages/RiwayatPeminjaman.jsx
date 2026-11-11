@@ -8,6 +8,7 @@ import {
   getStatusBadge,
 } from "../services/borrowService";
 import { confirmAction, toastError, toastSuccess } from "../utils/alert";
+import { copyTextToClipboard } from "../utils/clipboard";
 
 export default function RiwayatPeminjaman() {
   const [borrowings, setBorrowings] = useState([]);
@@ -45,12 +46,18 @@ export default function RiwayatPeminjaman() {
     }
   };
 
-  const copyCode = (code) => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(code);
+  const copyCode = async (code) => {
+    if (!code) {
+      toastError("Kode transaksi tidak ditemukan.");
+      return;
+    }
+    const success = await copyTextToClipboard(code);
+    if (success) {
       setCopiedCode(true);
       toastSuccess("Kode transaksi disalin!");
       setTimeout(() => setCopiedCode(false), 2000);
+    } else {
+      toastError("Gagal menyalin kode transaksi.");
     }
   };
 
@@ -598,10 +605,29 @@ export default function RiwayatPeminjaman() {
             {/* Modal Header */}
             <div className="flex items-start justify-between pb-4 border-b border-slate-100">
               <div>
-                <span className="text-xs font-bold uppercase text-slate-600 block">Detail Peminjaman</span>
-                <h3 className="text-xl font-mono font-bold text-slate-900 mt-0.5">
-                  {selectedBorrowing.transaction_code}
-                </h3>
+                <span className="text-xs font-bold uppercase text-slate-500 block">Kode Transaksi</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <h3 className="text-xl font-mono font-bold text-slate-900">
+                    {selectedBorrowing.transaction_code}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => copyCode(selectedBorrowing.transaction_code)}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 shadow-2xs transition-colors"
+                    title="Salin kode transaksi"
+                  >
+                    {copiedCode ? (
+                      <span className="text-emerald-600 font-bold">Tersalin!</span>
+                    ) : (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <span>Salin Kode</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
               <button
                 type="button"
@@ -615,18 +641,25 @@ export default function RiwayatPeminjaman() {
             {/* Status Info */}
             <div className="my-5 p-4 rounded-xl border flex items-center justify-between gap-4 bg-slate-50">
               <div>
-                <span className="text-xs text-slate-600 block font-medium">Status Peminjaman</span>
+                <span className="text-xs text-slate-500 block font-medium">Status Peminjaman</span>
                 <span className="text-base font-bold text-slate-900">
                   {getStatusBadge(selectedBorrowing.status, selectedBorrowing.is_overdue).label}
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={() => copyCode(selectedBorrowing.transaction_code)}
-                className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold hover:bg-slate-50 shadow-xs"
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
+                  getStatusBadge(selectedBorrowing.status, selectedBorrowing.is_overdue).bgClass
+                }`}
               >
-                {copiedCode ? "Tersalin!" : "Salin Kode"}
-              </button>
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    getStatusBadge(selectedBorrowing.status, selectedBorrowing.is_overdue).dotClass
+                  }`}
+                />
+                <span>
+                  {getStatusBadge(selectedBorrowing.status, selectedBorrowing.is_overdue).label}
+                </span>
+              </span>
             </div>
 
             {selectedBorrowing.status?.toUpperCase() === "APPROVED" && (

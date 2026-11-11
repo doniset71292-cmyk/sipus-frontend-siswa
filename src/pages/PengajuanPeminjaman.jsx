@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { getCurrentUser, getBooks, getBookDetail } from "../services/authService";
 import { createBorrowing, formatIndoDate } from "../services/borrowService";
-import { confirmAction, toastSuccess, alertError } from "../utils/alert";
+import { confirmAction, toastSuccess, toastError, alertError } from "../utils/alert";
+import { copyTextToClipboard } from "../utils/clipboard";
 
 export default function PengajuanPeminjaman() {
   const [searchParams] = useSearchParams();
@@ -175,12 +176,18 @@ export default function PengajuanPeminjaman() {
     }
   };
 
-  const copyToClipboard = (text) => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(text);
+  const copyToClipboard = async (text) => {
+    if (!text) {
+      toastError("Kode transaksi tidak ditemukan.");
+      return;
+    }
+    const success = await copyTextToClipboard(text);
+    if (success) {
       setCopiedCode(true);
       toastSuccess("Kode transaksi disalin!");
       setTimeout(() => setCopiedCode(false), 2000);
+    } else {
+      toastError("Gagal menyalin kode transaksi.");
     }
   };
 
