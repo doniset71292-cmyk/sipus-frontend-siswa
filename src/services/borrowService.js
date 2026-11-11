@@ -76,23 +76,35 @@ export async function cancelBorrowing(id) {
 }
 
 /**
- * Mengajukan peminjaman buku baru
+ * Mengajukan peminjaman buku baru (mendukung 1 atau banyak buku sekaligus)
  * @param {Object} payload
- * @param {number|string} payload.bookId ID buku yang dipinjam
- * @param {number} [payload.quantity=1] Jumlah buku
+ * @param {Array<{bookId?: number|string, book_id?: number|string, quantity?: number}>} [payload.items] Daftar item buku
+ * @param {number|string} [payload.bookId] ID buku tunggal (opsional / fallback backward compatibility)
+ * @param {number} [payload.quantity=1] Jumlah buku tunggal (fallback)
  * @param {string} payload.dueDate Tanggal batas pengembalian (format YYYY-MM-DD, max 3 hari dari hari ini)
  * @param {string} [payload.notes=""] Catatan/keperluan peminjaman
  * @returns {Promise<any>}
  */
-export async function createBorrowing({ bookId, quantity = 1, dueDate, notes = "" }) {
+export async function createBorrowing({ items, bookId, quantity = 1, dueDate, notes = "" }) {
   try {
-    const bodyPayload = {
-      items: [
+    let bodyPayloadItems = [];
+
+    if (Array.isArray(items) && items.length > 0) {
+      bodyPayloadItems = items.map((it) => ({
+        book_id: Number(it.bookId ?? it.book_id),
+        quantity: Number(it.quantity) || 1,
+      }));
+    } else if (bookId) {
+      bodyPayloadItems = [
         {
           book_id: Number(bookId),
           quantity: Number(quantity) || 1,
         },
-      ],
+      ];
+    }
+
+    const bodyPayload = {
+      items: bodyPayloadItems,
       notes: notes || undefined,
     };
 
